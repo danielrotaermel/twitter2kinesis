@@ -106,20 +106,20 @@ def index():
         return str('nope, not working!')
 
 
-# @app.route('/start')
-# def start():
-#     global t2k
-#     if not t2k.is_alive():
-#         t2k = Twitter2Kinesis()
-#         t2k.start()
-#     return str('running: ' + str(t2k.is_alive()))
+@app.route('/start')
+def start():
+    global t2k
+    if not t2k.is_alive():
+        t2k = Twitter2Kinesis()
+        t2k.start()
+    return str('running: ' + str(t2k.is_alive()))
 
 
-# @app.route('/stop')
-# def stop():
-#     if t2k.is_alive():
-#         t2k.join()
-#     return str('running: ' + str(t2k.is_alive()))
+@app.route('/stop')
+def stop():
+    if t2k.is_alive():
+        t2k.join()
+    return str('running: ' + str(t2k.is_alive()))
 
 
 if __name__ == "__main__":
