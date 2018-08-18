@@ -61,7 +61,11 @@ class Twitter2Kinesis(threading.Thread):
             print("%s starts" % (self.getName(),))
             try:
                 stream = twitter.request('statuses/filter',
-                                         {'track': '#trump', 'follow': usersToFollow})
+                                         {
+                                             #  'track': '#trump',
+                                             'follow': usersToFollow
+                                         }
+                                         )
                 for item in stream:
                     # stop proccesing when stopevent is set
                     if self._stopevent.isSet():
