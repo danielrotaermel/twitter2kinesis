@@ -118,8 +118,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     if t2k.is_alive():
-        msg = "<p>Yo, it's working!<br><br>Latest Tweet from " + latestTweet['user']['screen_name'] + " - " + parse(
-            latestTweet['created_at']).strftime("%B %d, %Y – %H:%M %z") + "<br><br>" + urlify2(json.dumps(latestTweet, indent=2)) + "<p>"
+        msg = "<html><body><p>Yo, it's working!<br><br>Latest Tweet from " + latestTweet['user']['screen_name'] + " - " + parse(
+            latestTweet['created_at']).strftime("%B %d, %Y – %H:%M %z") + "<br><br>" + urlify2(json.dumps(latestTweet, indent=2)) + "</p></body></html>"
         msg = msg.replace('\n', '<br />')
         return msg
     else:
@@ -132,7 +132,7 @@ def start():
     if not t2k.is_alive():
         t2k = Twitter2Kinesis()
         t2k.start()
-    return str('running: ' + str(t2k.is_alive()))
+    return str('<html><body>running: ' + str(t2k.is_alive()) + '</body></html>')
 
 
 # @app.route('/stop')
