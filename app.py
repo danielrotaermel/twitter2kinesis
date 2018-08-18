@@ -2,12 +2,13 @@
 
 import os
 import threading
+import re
 import time
 import boto3
 import json
 from flask import Flask
-from urllib3.exceptions import ProtocolError
 from TwitterAPI import TwitterAPI, TwitterConnectionError, TwitterRequestError
+from dateutil.parser import parse
 
 # aws credentials
 aws_access_key_id = os.environ['aws_access_key_id']
@@ -30,6 +31,19 @@ twitter = TwitterAPI(consumer_key, consumer_secret,
                      access_token_key, access_token_secret)
 
 usersToFollow = [822215679726100480, 25073877]  # realdonaldtrump, potus
+
+# variables that are accessible from anywhere
+latestTweet = {}
+# lock to control access to variable
+dataLock = threading.Lock()
+
+
+urlfinder = re.compile(
+    r"((https?):((//)|(\\\\))+[\w\d:#@%/;$()~_?\+-=\\\.&]*)", re.MULTILINE | re.UNICODE)
+
+
+def urlify2(value):
+    return urlfinder.sub(r'<a href="\1">\1</a>', value)
 
 
 class Twitter2Kinesis(threading.Thread):
@@ -54,17 +68,20 @@ class Twitter2Kinesis(threading.Thread):
                         break
                     if 'text' in item:
 
-                        # # filter out responses
-                        # if tweet['user']['id'] == usersToFollow[0] or tweet['user']['id'] == usersToFollow[1]:
-                        #     print(tweet['user']['id'])
-                        #     kinesis.put_record(StreamName="twitter",
-                        #                        Data=json.dumps(tweet), PartitionKey="filler")
+                        global latestTweet
+                        with dataLock:
+                            latestTweet = item
 
-                        # put tweets on kinesis stream
+                        # filter out responses to tweets from trump
                         kinesis.put_record(StreamName="twitter",
                                            Data=json.dumps(item), PartitionKey="filler")
 
                         print('tweet from: ' + item['user']['screen_name'],)
+
+                        # # put tweets on kinesis stream
+                        # kinesis.put_record(StreamName="twitter",
+                        #                    Data=json.dumps(item), PartitionKey="filler")
+
                         self._stopevent.wait(self._sleepperiod)
                     elif 'disconnect' in item:
                         event = item['disconnect']
@@ -101,7 +118,10 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     if t2k.is_alive():
-        return "Yo, it's working!"
+        msg = "<p>Yo, it's working!<br><br>Latest Tweet from " + latestTweet['user']['screen_name'] + " - " + parse(
+            latestTweet['created_at']).strftime("%B %d, %Y – %H:%M %z") + "<br><br>" + urlify2(json.dumps(latestTweet, indent=2)) + "<p>"
+        msg = msg.replace('\n', '<br />')
+        return msg
     else:
         return str('nope, not working!')
 
@@ -115,11 +135,11 @@ def start():
     return str('running: ' + str(t2k.is_alive()))
 
 
-@app.route('/stop')
-def stop():
-    if t2k.is_alive():
-        t2k.join()
-    return str('running: ' + str(t2k.is_alive()))
+# @app.route('/stop')
+# def stop():
+#     if t2k.is_alive():
+#         t2k.join()
+#     return str('running: ' + str(t2k.is_alive()))
 
 
 if __name__ == "__main__":
