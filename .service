@@ -1,0 +1,20 @@
+[Unit]
+Description=Gunicorn instance to serve {{ app_name }}
+After=network.target
+
+[Service]
+User={{ ansible_ssh_user }}
+Group=www-data
+WorkingDirectory=/home/{{ ansible_ssh_user }}/{{ app_name }}
+Environment=PATH=/home/{{ ansible_ssh_user }}/{{ app_name }}/env/bin
+ExecStart=/home/{{ ansible_ssh_user }}/{{ app_name }}/env/bin/gunicorn --bind unix:{{ app_name }}.sock -m 007 wsgi:app
+Environment=twitter_consumer_key={{ twitter_consumer_key }}
+Environment=twitter_consumer_secret={{ twitter_consumer_secret }}
+Environment=twitter_access_token={{ twitter_access_token }}
+Environment=twitter_access_token_secret={{ twitter_access_token_secret }}
+Environment=aws_access_key_id={{ aws_access_key_id }}
+Environment=aws_secret_access_key={{ aws_secret_access_key }}
+Environment=aws_region_name={{ aws_region_name }}
+
+[Install]
+WantedBy=multi-user.target
