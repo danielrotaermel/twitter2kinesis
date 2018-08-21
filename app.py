@@ -64,6 +64,7 @@ class Twitter2Kinesis(threading.Thread):
                                          {
                                              #  'track': '#trump',
                                              'follow': usersToFollow
+                                             'extended': true
                                          }
                                          )
                 for item in stream:
