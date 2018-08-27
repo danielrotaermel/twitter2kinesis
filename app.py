@@ -63,7 +63,7 @@ class Twitter2Kinesis(threading.Thread):
                 stream = twitter.request('statuses/filter',
                                          {
                                              #  'track': '#trump',
-                                             'follow': usersToFollow
+                                             'follow': usersToFollow,
                                              'extended': true
                                          }
                                          )
