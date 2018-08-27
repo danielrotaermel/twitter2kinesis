@@ -71,23 +71,18 @@ class Twitter2Kinesis(threading.Thread):
                     # stop proccesing when stopevent is set
                     if self._stopevent.isSet():
                         break
-                    if 'text' in item:
 
-                        global latestTweet
-                        with dataLock:
-                            latestTweet = item
+                    global latestTweet
+                    with dataLock:
+                        latestTweet = item
 
-                        # filter out responses to tweets from trump
-                        kinesis.put_record(StreamName="twitter",
-                                           Data=json.dumps(item), PartitionKey="filler")
+                    # put tweets on kinesis stream
+                    kinesis.put_record(StreamName="twitter",
+                                       Data=json.dumps(item), PartitionKey="filler")
 
-                        print('tweet from: ' + item['user']['screen_name'],)
+                    print('tweet from: ' + item['user']['screen_name'],)
 
-                        # # put tweets on kinesis stream
-                        # kinesis.put_record(StreamName="twitter",
-                        #                    Data=json.dumps(item), PartitionKey="filler")
-
-                        self._stopevent.wait(self._sleepperiod)
+                    self._stopevent.wait(self._sleepperiod)
                     elif 'disconnect' in item:
                         event = item['disconnect']
                         if event['code'] in [2, 5, 6, 7]:
