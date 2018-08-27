@@ -50,7 +50,7 @@ class Twitter2Kinesis(threading.Thread):
     def __init__(self, name='Twitter2Kinesis'):
         """ constructor, setting initial variables """
         self._stopevent = threading.Event()
-        self._sleepperiod = 1.0
+        self._sleepperiod = 0 # use this to lower the rate of processing
         threading.Thread.__init__(self, name=name)
         self.daemon = True  # Daemonize thread
 
@@ -64,7 +64,7 @@ class Twitter2Kinesis(threading.Thread):
                                          {
                                              #  'track': '#trump',
                                              'follow': usersToFollow,
-                                             'extended': true
+                                             'extended': True
                                          }
                                          )
                 for item in stream:
@@ -83,7 +83,7 @@ class Twitter2Kinesis(threading.Thread):
                     print('tweet from: ' + item['user']['screen_name'],)
 
                     self._stopevent.wait(self._sleepperiod)
-                    elif 'disconnect' in item:
+                    if 'disconnect' in item:
                         event = item['disconnect']
                         if event['code'] in [2, 5, 6, 7]:
                             # something needs to be fixed before re-connecting
