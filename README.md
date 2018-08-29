@@ -22,6 +22,9 @@ cd twitter2kinesis
 nano .hosts
 ```
 
+Rename 'secret.env.example.yml' to 'secret.env.yml' and change the secrets.
+These secrets will be made available as env variables on the EC2 instance.
+
 ## Deploying the app
 
 Run the deploy playbook.
