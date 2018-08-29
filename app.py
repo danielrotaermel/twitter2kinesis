@@ -50,9 +50,9 @@ class Twitter2Kinesis(threading.Thread):
     def __init__(self, name='Twitter2Kinesis'):
         """ constructor, setting initial variables """
         self._stopevent = threading.Event()
-        self._sleepperiod = 0 # use this to lower the rate of processing
+        self._sleepperiod = 0 # use this to lower the rate of processing tweets
         threading.Thread.__init__(self, name=name)
-        self.daemon = True  # Daemonize thread
+        self.daemon = True  # daemonize thread
 
     def run(self):
         """ main control loop """
@@ -60,13 +60,12 @@ class Twitter2Kinesis(threading.Thread):
         while not self._stopevent.isSet():
             print("%s starts" % (self.getName(),))
             try:
-                stream = twitter.request('statuses/filter',
-                                         {
-                                             #  'track': '#trump',
-                                             'follow': usersToFollow,
-                                             'extended': True
-                                         }
-                                         )
+                params = { #  'track': '#trump',
+                            'follow': usersToFollow,
+                            'extended': True
+                         }
+                stream = twitter.request('statuses/filter', params)
+
                 for item in stream:
                     # stop proccesing when stopevent is set
                     if self._stopevent.isSet():

@@ -1,6 +1,6 @@
-# flask-ansible-example
+# twitter2kinesis
 
-This is an example Flask app, ready to be deployed with a simplified Ansible playbook.
+A flask server that streams tweets from the twitter streaming api to AWS Kinesis, thanks to [@brennv](https://github.com/brennv/flask-ansible-example) it's ready to be deployed with a simplified Ansible playbook. Also there is a site.yml included that will deal wit the creation of a ec2 instance. Change the ami to your prefered distribution.
 
 The included deploy playbook will:
 - Install system apt packages
@@ -9,11 +9,12 @@ The included deploy playbook will:
 - Enable and start services
 - Check the url for the expected response
 
-The `deploy.yml` playbook is modeled after the manual steps discussed in this [digitalocean article](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04) using a Ubuntu [ML](https://www.digitalocean.com/community/tutorials/how-to-use-the-machine-learning-one-click-install-image-on-digitalocean) instance.
+The `deploy.yml` playbook is modeled after the manual steps discussed in this [digitalocean article](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-16-04)
 
 ## Prerequisites
 
 You'll need [Ansible installed](https://docs.ansible.com/ansible/latest/intro_installation.html) and SSH access to any hosts. Customize the `.hosts` file as needed.
+
 ```
 pip install ansible
 git clone https://github.com/brennv/flask-ansible-example.git
@@ -45,13 +46,13 @@ Check the logs on the host.
 ```
 journalctl -xe
 journalctl -u nginx
-journalctl -u flask-ansible-example
+journalctl -u twitter2kinesis
 ```
 
 Check the systemd status of the services on the host.
 ```
 sudo systemctl status nginx
-sudo systemctl status flask-ansible-example.service
+sudo systemctl status twitter2kinesis.service
 ```
 
 Test the app.
@@ -77,7 +78,7 @@ gunicorn --log-level debug --error-logfile error.log \
 Test gunicorn in debug mode binding to socket.
 ```
 gunicorn --workers 3 --log-level deketbug --error-logfile error.log \
-    --bind unix:flask-ansible-example.sock -m 007 wsgi:app
+    --bind unix:twitter2kinesis.sock -m 007 wsgi:app
 ```
 
 Run nginx tests.
@@ -104,7 +105,3 @@ Check facts.
 ```
 ansible webservers -m setup
 ```
-
-## TODO
-
-Add [CI](https://www.jeffgeerling.com/blog/testing-ansible-roles-travis-ci-github)

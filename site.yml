@@ -7,7 +7,7 @@
   vars:
     instance_type: t2.micro
     security_group: twitter2kinesis # Change the security group name here
-    image: ami-f4cc1de2
+    image: ami-f4cc1de2 # make sure python 2.7 is installed on the created machine -> sudo apt install python
     keypair: twitter2kinesis # This is one of my keys that i already have in AWS
     region: us-east-1 # Change the Region
     count: 1
