@@ -13,7 +13,7 @@ The `deploy.yml` playbook is modeled after the manual steps discussed in this [d
 
 ## Prerequisites
 
-You'll need [Ansible installed](https://docs.ansible.com/ansible/latest/intro_installation.html) and SSH access to any hosts. Customize the `.hosts` file as needed.
+You'll need [Ansible installed](https://docs.ansible.com/ansible/latest/intro_installation.html) and SSH access to any hosts. Customize the `.hosts` file as needed. Make sure the host you deploy to has python2.7 installed.
 
 ```shell
 pip install ansible
